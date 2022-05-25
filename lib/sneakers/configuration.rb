@@ -3,10 +3,29 @@ require 'forwardable'
 module Sneakers
   class Configuration
 
+
     extend Forwardable
     def_delegators :@hash, :to_hash, :[], :[]=, :==, :fetch, :delete, :has_key?
 
+    EXCHANGE_OPTION_DEFAULTS = {
+      :type               => :direct,
+      :durable            => true,
+      :auto_delete        => false,
+      :arguments => {} # Passed as :arguments to Bunny::Channel#exchange
+    }.freeze
+
+    QUEUE_OPTION_DEFAULTS = {
+      :durable            => true,
+      :auto_delete        => false,
+      :exclusive          => false,
+      :arguments => {}
+    }.freeze
+
     DEFAULTS = {
+      # Set up default handler which just logs the error.
+      # Remove this in production if you don't want sensitive data logged.
+      :error_reporters => [Sneakers::ErrorReporter::DefaultLogger.new],
+
       # runner
       :runner_config_file => nil,
       :metrics            => nil,
@@ -15,21 +34,18 @@ module Sneakers
       :workers            => 4,
       :log                => STDOUT,
       :pid_path           => 'sneakers.pid',
-      :amqp_heartbeat     => 10,
+      :amqp_heartbeat     => 30,
 
       # workers
-      :timeout_job_after  => 5,
       :prefetch           => 10,
       :threads            => 10,
       :share_threads      => false,
-      :durable            => true,
-      :auto_delete        => true,
       :ack                => true,
-      :heartbeat          => 2,
+      :heartbeat          => 30,
+      :hooks              => {},
       :exchange           => 'sneakers',
-      :exchange_type      => :direct,
-      :exchange_arguments => {}, # Passed as :arguments to Bunny::Channel#exchange
-      :hooks              => {}
+      :exchange_options   => EXCHANGE_OPTION_DEFAULTS,
+      :queue_options      => QUEUE_OPTION_DEFAULTS
     }.freeze
 
 
@@ -45,6 +61,7 @@ module Sneakers
 
     def merge!(hash)
       hash = hash.dup
+      hash = map_all_deprecated_options(hash)
 
       # parse vhost from amqp if vhost is not specified explicitly, only
       # if we're not given a connection to use.
@@ -63,7 +80,7 @@ module Sneakers
         end
       end
 
-      @hash.merge!(hash)
+      @hash = deep_merge(@hash, hash)
     end
 
     def merge(hash)
@@ -83,5 +100,26 @@ module Sneakers
     end
     alias_method :inspect_without_redaction, :inspect
     alias_method :inspect, :inspect_with_redaction
+
+    def map_all_deprecated_options(hash)
+      hash = map_deprecated_options_key(:exchange_options, :exchange_type, :type, true, hash)
+      hash = map_deprecated_options_key(:exchange_options, :exchange_arguments, :arguments, true, hash)
+      hash = map_deprecated_options_key(:exchange_options, :durable, :durable, false, hash)
+      hash = map_deprecated_options_key(:queue_options, :durable, :durable, true, hash)
+      hash = map_deprecated_options_key(:queue_options, :arguments, :arguments, true, hash)
+      hash
+    end
+
+    def map_deprecated_options_key(target_key, deprecated_key, key, delete_deprecated_key, hash = {})
+      return hash if hash[deprecated_key].nil?
+      hash = deep_merge({ target_key => { key => hash[deprecated_key] } }, hash)
+      hash.delete(deprecated_key) if delete_deprecated_key
+      hash
+    end
+
+    def deep_merge(first, second)
+      merger = proc { |_, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+      first.merge(second, &merger)
+    end
   end
 end
