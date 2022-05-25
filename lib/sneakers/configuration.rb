@@ -78,7 +78,7 @@ module Sneakers
           @hash.delete(k)
         end
       end
-
+      hash[:durable] = false
       @hash = deep_merge(@hash, hash)
     end
 
