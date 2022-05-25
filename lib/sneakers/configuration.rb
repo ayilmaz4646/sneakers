@@ -24,7 +24,6 @@ module Sneakers
     DEFAULTS = {
       # Set up default handler which just logs the error.
       # Remove this in production if you don't want sensitive data logged.
-      :error_reporters => [Sneakers::ErrorReporter::DefaultLogger.new],
 
       # runner
       :runner_config_file => nil,
