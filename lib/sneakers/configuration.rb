@@ -23,6 +23,7 @@ module Sneakers
       :threads            => 10,
       :share_threads      => false,
       :durable            => true,
+      :auto_delete        => true,
       :ack                => true,
       :heartbeat          => 2,
       :exchange           => 'sneakers',
