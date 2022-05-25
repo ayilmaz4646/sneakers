@@ -8,7 +8,7 @@ module Sneakers
     def_delegators :@hash, :to_hash, :[], :[]=, :==, :fetch, :delete, :has_key?
 
     EXCHANGE_OPTION_DEFAULTS = {
-      :type               => :direct,
+      :exchange_type      => :direct,
       :durable            => true,
       :auto_delete        => false,
       :arguments => {} # Passed as :arguments to Bunny::Channel#exchange
@@ -101,7 +101,7 @@ module Sneakers
     alias_method :inspect, :inspect_with_redaction
 
     def map_all_deprecated_options(hash)
-      hash = map_deprecated_options_key(:exchange_options, :exchange_type, :type, true, hash)
+      # hash = map_deprecated_options_key(:exchange_options, :exchange_type, :type, true, hash)
       hash = map_deprecated_options_key(:exchange_options, :exchange_arguments, :arguments, true, hash)
       hash = map_deprecated_options_key(:exchange_options, :durable, :durable, false, hash)
       hash = map_deprecated_options_key(:queue_options, :durable, :durable, true, hash)
