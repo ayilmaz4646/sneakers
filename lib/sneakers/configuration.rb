@@ -9,13 +9,13 @@ module Sneakers
 
     EXCHANGE_OPTION_DEFAULTS = {
       :exchange_type      => :direct,
-      :durable            => true,
+      :durable            => false,
       :auto_delete        => false,
       :arguments => {} # Passed as :arguments to Bunny::Channel#exchange
     }.freeze
 
     QUEUE_OPTION_DEFAULTS = {
-      :durable            => true,
+      :durable            => false,
       :auto_delete        => false,
       :exclusive          => false,
       :arguments => {}
