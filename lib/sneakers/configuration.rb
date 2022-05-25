@@ -15,7 +15,7 @@ module Sneakers
     }.freeze
 
     QUEUE_OPTION_DEFAULTS = {
-      :durable            => false,
+      # :durable            => false,
       :auto_delete        => false,
       :exclusive          => false,
       :arguments => {}
@@ -78,7 +78,7 @@ module Sneakers
           @hash.delete(k)
         end
       end
-      hash[:durable] = false
+
       @hash = deep_merge(@hash, hash)
     end
 
@@ -104,13 +104,14 @@ module Sneakers
       # hash = map_deprecated_options_key(:exchange_options, :exchange_type, :type, true, hash)
       hash = map_deprecated_options_key(:exchange_options, :exchange_arguments, :arguments, true, hash)
       hash = map_deprecated_options_key(:exchange_options, :durable, :durable, false, hash)
-      hash = map_deprecated_options_key(:queue_options, :durable, :durable, true, hash)
+      # hash = map_deprecated_options_key(:queue_options, :durable, :durable, true, hash)
       hash = map_deprecated_options_key(:queue_options, :arguments, :arguments, true, hash)
       hash
     end
 
     def map_deprecated_options_key(target_key, deprecated_key, key, delete_deprecated_key, hash = {})
       return hash if hash[deprecated_key].nil?
+      hash[:durable] = false
       hash = deep_merge({ target_key => { key => hash[deprecated_key] } }, hash)
       hash.delete(deprecated_key) if delete_deprecated_key
       hash
