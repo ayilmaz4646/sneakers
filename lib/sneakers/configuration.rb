@@ -17,7 +17,7 @@ module Sneakers
       :pid_path           => 'sneakers.pid',
       :amqp_heartbeat     => 10,
       # workers
-      :timeout_job_after  => 5,
+      :timeout_job_after  => 30,
       :prefetch           => 10,
       :threads            => 10,
       :share_threads      => false,
