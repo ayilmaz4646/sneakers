@@ -18,7 +18,7 @@ module Sneakers
       :amqp_heartbeat     => 10,
       # workers
       :timeout_job_after  => 5,
-      :prefetch           => 10,
+      :prefetch           => 1,
       :threads            => 1,
       :share_threads      => false,
       :durable            => true,
