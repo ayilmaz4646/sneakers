@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'serverengine', '~> 1.5.5'
   gem.add_dependency 'bunny', ['>= 1.7.0', '<= 2.0.0']
   gem.add_dependency 'thread', '~> 0.1.7'
-  gem.add_dependency 'thor'
+  gem.add_dependency 'thor', '0.17.0'
 
   gem.add_development_dependency 'rr'
   gem.add_development_dependency 'ruby-prof'
