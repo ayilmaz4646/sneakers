@@ -19,6 +19,7 @@ describe Sneakers::Publisher do
       p.publish('test msg', to_queue: 'downloads')
     end
 
+
     it 'should publish with the persistence specified' do
       xchg = Object.new
       mock(xchg).publish('test msg', routing_key: 'downloads', persistence: true)
